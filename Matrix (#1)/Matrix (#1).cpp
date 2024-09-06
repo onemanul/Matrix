@@ -1,5 +1,4 @@
 ﻿#include<iostream>
-#include"vctr.h"
 #include"Matrix.h"
 using namespace std;
 

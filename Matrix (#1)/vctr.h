@@ -13,12 +13,13 @@ class vctr {
 		vctr(bool row) : as_row(row) {}
 		vctr(vector <double> v) : vec(v), as_row(true) {}
 		vctr(vector <double> v, bool row) : vec(v), as_row(row) {}
-		void transpos() { as_row = !as_row; }
+		void trans() { as_row = !as_row; }
 
 		friend double norm_first(vctr& v);
 		friend double norm_second(vctr& v);
 		friend double norm_infinity(vctr& v);
 
+		friend vctr transpos(vctr& v);
 		friend vctr operator*(double A, vctr& v);
 		friend vctr operator*(vctr& v, double A);
 		friend vctr operator+(vctr& l, vctr& r);
@@ -27,4 +28,4 @@ class vctr {
 		friend ostream& operator<<(ostream& out, vctr& v);
 };
 
-#endif // !VCTR_H
+#endif // VCTR_H
