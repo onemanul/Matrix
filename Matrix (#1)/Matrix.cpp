@@ -41,7 +41,54 @@ double norm_evkl(Matrix& m) {
     return sqrt(s);
 }
 
-friend Matrix inverse(Matrix& m);
+Matrix inverse(Matrix& m) {
+    if (m.getCols() != m.getRows()) return NULL;
+    Matrix tmp = m;
+    size_t Nmax, n = m.getCols();
+    double del;
+    // создание матрицы Е справа
+    for (int i = 0; i < n; i++) {
+        for (int j = n; j < n + n; j++) {
+            if (j == n + i) tmp.data[i].push_back(1);
+            else tmp.data[i].push_back(0);
+        }
+    }
+    for (int K = 0; K < n; K++) {
+        // |max| по главной диагонали, меняя строки
+        Nmax = K;
+        for (int i = K + 1; i < n; i++) {
+            if (fabs(tmp.data[i][K]) > fabs(tmp.data[Nmax][K]))
+                Nmax = i;
+        }
+        if (Nmax != K) {
+            for (int j = 0; j < n + n; j++)
+                swap(tmp.data[K][j], tmp.data[Nmax][j]);
+        }
+        // обнуление ниже главной диагонали
+        for (int i = K; i < n; i++) {
+            if (i == K) del = tmp.data[K][K];
+            else del = tmp.data[i][K];
+            for (int j = K; j < n + n; j++) {
+                if (i == K)
+                    tmp.data[K][j] /= del;
+                else
+                    tmp.data[i][j] = tmp.data[i][j] - tmp.data[K][j] * del;
+            }
+        }
+    }
+    // обнуление выше главной диагонали
+    for (int K = n - 1; K > 0; K--) {
+        for (int i = K - 1; i >= 0; i--) {
+            del = tmp.data[i][K];
+            for (int j = K; j < n + n; j++)
+                tmp.data[i][j] = tmp.data[i][j] - tmp.data[K][j] * del;
+        }
+    }
+    // удаление исходной матрицы
+    for (int i = 0; i < n; ++i)
+        tmp.data[i].erase(tmp.data[i].begin(), tmp.data[i].begin() + n);
+    return tmp;
+}
 Matrix transpos(Matrix& m) {
     Matrix tmp = m;
     for (int i = 0; i < tmp.getRows(); ++i) {
@@ -121,56 +168,4 @@ ostream& operator<<(ostream& out, Matrix& m) {
     }
     out << "\n";
     return out;
-}
-
-
-
-void swap(double* a, double *b) {
-    double t = *a;
-    *a = *b;
-    *b = t;
-}
-
-void Obratnaya(double** a, int n) {
-    int Nmax;
-    double del;
-    // дозаполнение матрицы Е справа
-    for (int i = 0; i < n; i++)
-        for (int j = n; j < n + n; j++) {
-            if (j == n + i) a[i][j] = 1;
-            else a[i][j] = 0;
-        }
-
-    for (int K = 0; K < n; K++) {
-        // |max| по главной диагонали
-        Nmax = K;
-        for (int i = K + 1; i < n; i++) {
-            if (fabs(a[i][K]) > fabs(a[Nmax][K]))
-                Nmax = i;
-        }
-        if (Nmax != K) {
-            for (int j = 0; j < n + n; j++)
-                swap(&a[K][j], &a[Nmax][j]);
-        }
-        // обнуление ниже главной диагонали
-        for (int i = K; i < n; i++) {
-            if (i == K) del = a[K][K];
-            else del = a[i][K];
-            for (int j = K; j < n + n; j++) {
-                if (i == K)
-                    a[K][j] /= del;
-                else
-                    a[i][j] = a[i][j] - a[K][j] * del;
-            }
-        }
-    }
-
-    // обнуление выше главной диагонали
-    for (int K = n - 1; K > 0; K--) {
-        for (int i = K - 1; i >= 0; i--) {
-            del = a[i][K];
-            for (int j = K; j < n + n; j++)
-                a[i][j] = a[i][j] - a[K][j] * del;
-        }
-    }
 }

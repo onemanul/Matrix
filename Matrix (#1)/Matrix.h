@@ -11,9 +11,9 @@ class Matrix {
 		Matrix(size_t rows, size_t cols) : data(rows, vector<double>(cols, 0.0)) {}
 		Matrix(vector<vector<double>> dt) : data(dt) {}
 		Matrix(vctr v);
-
-        size_t getRows() const { return data.size(); }
-        size_t getCols() const { return data[0].size(); }
+		
+		size_t getRows() const { return data.size(); }
+		size_t getCols() const { return data[0].size(); }
 		double& operator()(size_t row, size_t col) { return data[row][col]; }
 
 		friend double norm_first(Matrix& m);
