@@ -3,6 +3,7 @@
 #define MATRIX_H
 
 #include"vctr.h"
+#include<iomanip>
 
 class Matrix {
 	public:
@@ -16,6 +17,8 @@ class Matrix {
 		
 		size_t getRows() const { return data.size(); }
 		size_t getCols() const { return data[0].size(); }
+		void moreRow(size_t r);									// увеличивает количество строк на r, заполняет нулями
+		void moreCol(size_t с);									// увеличивает количество столбцов на с, заполняет нулями
 		double& operator()(size_t row, size_t col) { return data[row][col]; }
 
 		friend double norm_first(Matrix& m);
@@ -25,10 +28,10 @@ class Matrix {
 		friend double conditioning_infinity(Matrix& m);
 		friend double conditioning_evkl(Matrix& m);
 
-		friend Matrix inverse(Matrix& m);
-		friend double determinant(Matrix& m);
-		friend vctr SLAE(Matrix& mtr);
-		friend Matrix transpos(Matrix& m);
+		friend Matrix inverse(Matrix& m);						// обратная матрица
+		friend double determinant(Matrix& m);					// определитель
+		friend vctr SLAE(Matrix& mtr);							// решение СЛАУ, вектор-столбец
+		friend Matrix transpos(Matrix& m);						// транспозиция
 		
 
 		friend Matrix operator*(double A, Matrix& m);
@@ -40,6 +43,7 @@ class Matrix {
 		friend Matrix operator*(Matrix& l, Matrix& r);
 		friend bool operator==(Matrix& left, Matrix& right);
 		friend ostream& operator<<(ostream& out, Matrix& m);
+		friend Matrix operator+(Matrix& m, vctr& v);			// добавляет к матрице строку или столбец вектора
 
 	private:
 		vector<vector<double>> data;

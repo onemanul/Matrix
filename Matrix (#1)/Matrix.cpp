@@ -23,6 +23,16 @@ Matrix Matrix::rand_matr(size_t rows, size_t cols) {
     }
     return m;
 }
+void Matrix::moreRow(size_t r) {
+    vector<double> v(data[0].size(), 0);
+    for (size_t i = 0; i < r; ++i) data.push_back(v);
+}
+void Matrix::moreCol(size_t c) {
+    size_t n = data.size();
+    for (size_t i = 0; i < n; ++i)
+        for (size_t k = 0; k < c; ++k)
+            data[i].push_back(0);
+}
 
 double norm_first(Matrix& m) {
     double mx = 0, s;
@@ -160,7 +170,7 @@ vctr SLAE(Matrix& mtr) {
     }
     do_zero_upper_diag(tmp);                // обнуление выше главной диагонали
     for (size_t i = 0; i < n; ++i)
-        ans.vec.push_back(tmp(i, n));          // учитываем смену исксов при смене строк
+        ans.vec.push_back(tmp(i, n));
     return ans;
 }
 
@@ -240,10 +250,30 @@ bool operator==(Matrix& left, Matrix& right) {
 ostream& operator<<(ostream& out, Matrix& m) {
     for (int i = 0; i < m.getRows(); ++i) {
         for (int j = 0; j < m.getCols(); ++j) {
-            out << m(i, j) << " ";
+            out << setw(12) << setprecision(10) << m(i, j) << " ";
         }
         out << "\n";
     }
     out << "\n";
     return out;
+}
+Matrix operator+(Matrix& m, vctr& v) {
+    if (v.as_row && v.vec.size() == m.getCols()) {
+        Matrix tmp = m;
+        tmp.moreRow(1);
+        size_t n = tmp.getCols(), i = m.getRows();
+        for (int j = 0; j < n; ++j)
+            tmp(i, j) = v.vec[j];
+        return tmp;
+    }
+    if (!v.as_row && v.vec.size() == m.getRows()) {
+        Matrix tmp = m;
+        tmp.moreCol(1);
+        size_t n = tmp.getRows(), j = m.getCols();
+        for (int i = 0; i < n; ++i)
+            tmp(i, j) = v.vec[i];
+        return tmp;
+    }
+    cout << "    Error: wrong sizes or position (matrix + vctr)\n\n";
+    return NULL;
 }
