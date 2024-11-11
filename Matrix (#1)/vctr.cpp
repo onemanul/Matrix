@@ -48,11 +48,8 @@ vctr operator-(vctr& l, vctr& r) {
 	return l + tmp;
 }
 double operator*(vctr& l, vctr& r) {
-	if (l.vec.size() == r.vec.size() && r.vec.size() == 1) {
-		return l.vec[0] * r.vec[0];
-	}
-	if (l.vec.size() != r.vec.size() || !l.as_row || r.as_row) {
-		cout << "    Error: wrong size or wrong position (vctr * vctr)\n\n";
+	if (l.vec.size() != r.vec.size()) {
+		cout << "    Error: wrong size (vctr * vctr)\n\n";
 		return NULL;
 	}
 	double s = 0;
@@ -73,4 +70,11 @@ ostream& operator<<(ostream& out, vctr& v) {
 	if (v.as_row) out << "row \n\n";
 	else out << "column \n\n";
 	return out;
+}
+vctr operator/(vctr& v, double A) {
+	vctr tmp = v;
+	for (size_t i = 0; i < v.vec.size(); ++i) {
+		tmp.vec[i] /= A;
+	}
+	return tmp;
 }

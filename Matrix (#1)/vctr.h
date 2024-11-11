@@ -27,6 +27,7 @@ class vctr {
 		friend double operator*(vctr& l, vctr& r);
 		friend bool operator==(const vctr& left, const vctr& right);
 		friend ostream& operator<<(ostream& out, vctr& v);
+		friend vctr operator/(vctr& v, double A);
 };
 
 #endif // VCTR_H
