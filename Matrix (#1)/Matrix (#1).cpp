@@ -3,7 +3,7 @@
 #include <fstream>
 #include <random>
 using namespace std;
-
+/*
 double pre_estimate_slae(Matrix& m) {
     if (m.getCols() != m.getRows() + 1) {
         cout << "    Error: wrong size for SLAE\n\n";
@@ -102,7 +102,7 @@ void Zadanie_3() {
         cout << "Столбец b:\n" << b << "Решение:LU\n" << (x = SLAE_LU(a, b)) << "\n\n";
     }
 }
-/*
+
 void Zadanie_4() {
     vector<double>  V = { 18,2,14,5,-21 }, B_TOM = { 1,0,0,0 }, B_TOM2 = { 4.5,8.45,10.63,38.123,52.12365,69.4125,26.52,7.002,22.01203,9.1,3.999,-1.156 };
     vctr x, v(V, 0), b_tom(B_TOM, 0), b_tom2(B_TOM2, 0);
@@ -271,8 +271,7 @@ void Zadanie_7() {
 
 int main() {
     setlocale(LC_ALL, "Russian");
-    vector<double> B = { 1.058, 2.155626, -0.15626, -8.100005, 5.102034 };
-    vctr x, b(B, 0);
+    vctr x, b({ 1.058, 2.155626, -0.15626, -8.100005, 5.102034 }, 0);
     vector<vector<double>> A = {
         {3.2, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0},
         {0.5, 2.8, 0.7, 0.0, 0.0, 0.0, 0.0},
@@ -289,7 +288,7 @@ int main() {
             {0.1, 0.1, 0.1, 0.4, 0.2},
             {0.1, 0.1, 0.1, 0.1, 0.5}
     };
-    Matrix a(A), c(C), tmp;
+    Matrix a(A), c(C), l, u, L, U, tmp;
     
     return 0;
 }

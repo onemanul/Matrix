@@ -18,31 +18,31 @@ class Matrix {
 		size_t getRows() const { return data.size(); }
 		size_t getCols() const { return data[0].size(); }
 		double& operator()(size_t row, size_t col) { return data[row][col]; }
+
 		void changeRow(size_t r);								// количество строк = r. Заполняет нулями, если матрица увеличилась
 		void changeCol(size_t с);								// количество столбцов = с. Заполняет нулями, если матрица увеличилась
 		void swap_rows(size_t a, size_t b);						// меняет местами строки a и b
+
 		bool is_symmetry();										// проверка матрицы на симметричность
 		bool is_positive_definite();							// проверка матрицы на положительную определённость
 		bool is_tridiagonal();									// проверка матрицы на тридиагональность
 		vctr to_vector();										// перевод матрицы в вектор (строку или столбец), если это возможно
 
-		friend double norm_first(Matrix& m);								// вычисление абсолютной (1-нормы)
-		friend double norm_infinity(Matrix& m);								// вычисление  максимальной (inf-нормы)
-		friend double norm_evkl(Matrix& m);									// вычисление евклидовой нормы
-		friend double conditioning_first(Matrix& m);
-		friend double conditioning_infinity(Matrix& m);
-		friend double conditioning_evkl(Matrix& m);
+		double norm_first();												// вычисление абсолютной (1-нормы)
+		double norm_infinity();												// вычисление  максимальной (inf-нормы)
+		double norm_evkl();													// вычисление евклидовой нормы
+
+		double determinant();												// определитель
+		double determinant_with_LU();										// определитель с помощью LU-разложения
+
+		bool find_LU_matrix(Matrix& L, Matrix& U);							// нахождение LU разложения матрицы А
+		bool find_QR_matrix(Matrix& Q, Matrix& R);							// нахождение QR разложения матрицы А
+		bool find_P_matrix(Matrix& P);										// нахождение матрицы перестановок Р для матрицы А
+		bool find_L_Lt_matrix(Matrix& L, Matrix& L_t);						// нахождение матриц L и L_t для метода Холецкого
+
 
 		friend Matrix inverse(Matrix& m);									// обратная матрица
 		friend Matrix transpos(Matrix& m);									// транспозиция
-		friend double determinant(Matrix& m);								// определитель
-		friend double determinant_with_LU(Matrix& m);						// определитель с помощью LU-разложения
-
-		friend bool find_LU_matrix(Matrix& A, Matrix& L, Matrix& U);		// нахождение LU разложения матрицы А
-		friend bool find_QR_matrix(Matrix& A, Matrix& Q, Matrix& R);		// нахождение QR разложения матрицы А
-		friend bool find_P_matrix(Matrix& A, Matrix& P);					// нахождение матрицы перестановок Р для матрицы А
-		friend bool find_L_Lt_matrix(Matrix& A, Matrix& L, Matrix& L_t);	// нахождение матриц L и L_t для метода Холецкого
-
 		friend vctr SLAE(Matrix& mtr);										// решение СЛАУ, поиск главного элемента по строкам
 		friend vctr SLAE(Matrix& mtr, int metod);							// решение СЛАУ с выбором метода поиска главного элемента: 0 - по строкам, 1 - по столбцам, 2 - по строкам и столбцам
 		friend vctr SLAE_LU(Matrix& mtr, vctr& b);							// решение СЛАУ с помощью LU разложения

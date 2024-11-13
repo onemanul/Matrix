@@ -1,2 +1,24 @@
 ﻿  Matrix (#1).cpp
+  Matrix.cpp
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(108,16): warning C4267: return: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(121,16): warning C4267: return: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(142,16): warning C4267: return: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(184,16): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(200,16): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(222,14): warning C4244: инициализация: преобразование "size_t" в "double", возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(223,17): warning C4244: аргумент: преобразование "double" в "size_t", возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(223,14): warning C4244: аргумент: преобразование "double" в "size_t", возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(235,14): warning C4244: инициализация: преобразование "size_t" в "double", возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(236,18): warning C4244: аргумент: преобразование "double" в "size_t", возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(237,18): warning C4244: аргумент: преобразование "double" в "size_t", возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(347,24): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(447,47): warning C4267: =: преобразование из "size_t" в "_Ty"; возможна потеря данных
+          with
+          [
+              _Ty=int
+          ]
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(551,16): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(587,11): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Alina\Desktop\C\Matrix (#1)\Matrix (#1)\Matrix.cpp(616,11): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+  Создание кода...
   Matrix (#1).vcxproj -> C:\Users\Alina\Desktop\C\Matrix (#1)\x64\Debug\Matrix (#1).exe

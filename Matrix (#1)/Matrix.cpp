@@ -39,6 +39,7 @@ void Matrix::swap_rows(size_t a, size_t b) {
     data[a] = data[b];
     data[b] = tmp;
 }
+
 bool Matrix::is_symmetry() {
     if (data.size() != data[0].size()) return false;
     size_t n = data.size();
@@ -53,7 +54,7 @@ bool Matrix::is_positive_definite() {
     if (data.size() != data[0].size()) return false;
     Matrix tmp(data);
     for (size_t i = tmp.getCols()-1; i > 0; --i) {
-        if (determinant(tmp) <= 0) return false;
+        if (tmp.determinant() <= 0) return false;
         tmp.changeRow(i);
         tmp.changeCol(i);
     }
@@ -94,62 +95,16 @@ vctr Matrix::to_vector() {
 }
 
 
-double norm_first(Matrix& m) {
-    double mx = 0, s;
-    for (int j = 0; j < m.getCols(); ++j) {
-        s = 0;
-        for (int i = 0; i < m.getRows(); ++i) {
-            s += fabs(m(i,j));
-        }
-        if (mx<s) mx = s;
-    }
-    return mx;
-}
-double norm_infinity(Matrix& m) {
-    double mx = 0, s;
-    for (int i = 0; i < m.getRows(); ++i) {
-        s = 0;
-        for (int j = 0; j < m.getCols(); ++j) {
-            s += fabs(m(i, j));
-        }
-        if (mx < s) mx = s;
-    }
-    return mx;
-}
-double norm_evkl(Matrix& m) {
-    double s = 0;
-    for (int i = 0; i < m.getRows(); ++i) {
-        for (int j = 0; j < m.getCols(); ++j) {
-            s += m(i, j)*m(i,j);
-        }
-    }
-    return sqrt(s);
-}
-
-double conditioning_first(Matrix& m) {
-    Matrix tmp = inverse(m);
-    return norm_first(m) * norm_first(tmp);
-}
-double conditioning_infinity(Matrix& m) {
-    Matrix tmp = inverse(m);
-    return norm_infinity(m) * norm_infinity(tmp);
-}
-double conditioning_evkl(Matrix& m) {
-    Matrix tmp = inverse(m);
-    return norm_evkl(m) * norm_evkl(tmp);
-}
-
-
 // Нужны для обратной, определителя, решений СЛАУ-------------------
 int mod_max_row(Matrix& tmp, size_t K) {                   // |max| по главной диагонали, меняя строки. K - от какой строки вниз. При смене строк det меняет знак
     size_t Nmax = K, n = tmp.getRows(), m = tmp.getCols();
     for (size_t i = K + 1; i < n; i++) {
-        if ( fabs(tmp(i,K)) > fabs(tmp(Nmax,K)) )
+        if (fabs(tmp(i, K)) > fabs(tmp(Nmax, K)))
             Nmax = i;
     }
     if (Nmax != K) {
         for (size_t j = 0; j < m; j++)
-            swap(tmp(K,j), tmp(Nmax,j));
+            swap(tmp(K, j), tmp(Nmax, j));
         return Nmax;
     }
     return 0;
@@ -211,9 +166,9 @@ bool do_zero_under_diag_for_LU(Matrix& U, size_t K, Matrix& L) {            // о
     size_t n = U.getRows(), m = U.getCols();
     double mu;
     if (!U(K, K)) return false;
-    for (size_t i = K+1; i < n; i++) {
+    for (size_t i = K + 1; i < n; i++) {
         if (!U(i, K)) continue;
-        else mu = U(i, K)/U(K,K);
+        else mu = U(i, K) / U(K, K);
         for (size_t j = K; j < n; j++) {
             if (U(K, j)) {
                 U(i, j) = U(i, j) - U(K, j) * mu;
@@ -228,7 +183,7 @@ void do_zero_upper_diag(Matrix& tmp) {                      // обнуление выше гл
     double del;
     for (int K = n - 1; K > 0; K--) {
         for (int i = K - 1; i >= 0; i--) {
-            del = tmp(i,K);
+            del = tmp(i, K);
             if (del) {
                 for (int j = K; j < m; j++) {
                     if (tmp(K, j)) {
@@ -244,7 +199,7 @@ void do_zero_upper_diag_without_ones(Matrix& tmp) {                      // сдел
     double del;
     for (int K = n - 1; K >= 0; K--) {
         if (tmp(K, K) != 1) {
-            del = tmp(K,K);
+            del = tmp(K, K);
             for (int j = K; j < m; ++j) {
                 if (tmp(K, j)) {
                     tmp(K, j) /= del;
@@ -265,7 +220,7 @@ void do_zero_upper_diag_without_ones(Matrix& tmp) {                      // сдел
 }
 Matrix B_matrix(Matrix& A) {
     double n = A.getRows(), divisor;
-    Matrix B(n,n);
+    Matrix B(n, n);
     for (size_t i = 0; i < n; ++i) {
         divisor = A(i, i);
         for (size_t j = 0; j < n; ++j) {
@@ -278,10 +233,10 @@ Matrix B_matrix(Matrix& A) {
 void B1_B2_matrix(Matrix& A, Matrix& B1, Matrix& B2) {
     Matrix B = B_matrix(A);
     double n = B.getRows();
-    B2.changeCol(n); 
+    B2.changeCol(n);
     B2.changeRow(n);
-    for (size_t i = 0; i < n-1; ++i) {
-        for (size_t j = i+1; j < n; ++j) {
+    for (size_t i = 0; i < n - 1; ++i) {
+        for (size_t j = i + 1; j < n; ++j) {
             B2(i, j) = B(i, j);
             B(i, j) = 0;
         }
@@ -289,6 +244,148 @@ void B1_B2_matrix(Matrix& A, Matrix& B1, Matrix& B2) {
     B1 = B;
 }
 // ----------------------------------------------------------------
+
+
+double Matrix::norm_first() {
+    if (!data.size()) return 0;
+    double mx = 0, s;
+    for (int j = 0; j < data[0].size(); ++j) {
+        s = 0;
+        for (int i = 0; i < data.size(); ++i) {
+            s += fabs(data[i][j]);
+        }
+        if (mx < s) mx = s;
+    }
+    return mx;
+}
+double Matrix::norm_infinity() {
+    double mx = 0, s;
+    for (int i = 0; i < data.size(); ++i) {
+        s = 0;
+        for (int j = 0; j < data[0].size(); ++j) {
+            s += fabs(data[i][j]);
+        }
+        if (mx < s) mx = s;
+    }
+    return mx;
+}
+double Matrix::norm_evkl() {
+    double s = 0;
+    for (int i = 0; i < data.size(); ++i) {
+        for (int j = 0; j < data[0].size(); ++j) {
+            s += data[i][j] * data[i][j];
+        }
+    }
+    return sqrt(s);
+}
+
+double Matrix::determinant() {
+    if (getCols() != getRows()) return 0;
+    Matrix tmp(data);
+    size_t n = getCols();
+    double det = 1;
+    for (size_t K = 0; K < n; K++) {
+        if (mod_max_row(tmp, K)) det = -det;
+        det *= tmp(K,K);
+        do_zero_under_diag(tmp, K);
+    }
+    return det;
+}
+double Matrix::determinant_with_LU() {
+    Matrix L, U;
+    if (!find_LU_matrix(L, U)) return 0;
+    else {
+        double s = 1;
+        for (size_t i = 0; i < U.getRows(); ++i)
+            s *= U(i, i);
+        return s;
+    }
+}
+
+bool Matrix::find_LU_matrix(Matrix& L, Matrix& U) {
+    if (getCols() != getRows()) {
+        cout << "    Error: wrong size for LU_matrix\n\n";
+        return false;
+    }
+    size_t n = getRows();
+    Matrix tmp_U(data), tmp_L = Matrix::unit_matr(n);
+    for (size_t K = 0; K < n - 1; K++) {
+        if (!do_zero_under_diag_for_LU(tmp_U, K, tmp_L)) {
+            cout << "    Error: LU is impossible\n\n";
+            return false;
+        }
+    }
+    L = tmp_L;
+    U = tmp_U;
+    return true;
+}
+bool Matrix::find_P_matrix(Matrix& P) {
+    if (getCols() != getRows()) {
+        cout << "    Error: wrong size for P_matrix\n\n";
+        return false;
+    }
+    size_t n = getRows(), Nmax;
+    Matrix tmp_A(data), tmp_P = Matrix::unit_matr(n);
+    for (size_t K = 0; K < n - 1; K++) {
+        Nmax = mod_max_row(tmp_A, K);
+        if (Nmax) tmp_P.swap_rows(K, Nmax);
+    }
+    P = tmp_P;
+    return true;
+}
+bool Matrix::find_L_Lt_matrix(Matrix& L, Matrix& L_t) {
+    if (getRows() == 1 || !is_symmetry() || !is_positive_definite()) {
+        cout << "    Error: Cholesky decomposition is impossible\n\n";
+        return false;
+    }
+    size_t n = getCols();
+    Matrix tmp(n);
+    double sum;
+    for (size_t j = 0; j < n; ++j) {
+        for (size_t i = j; i < n; ++i) {
+            sum = 0;
+            for (int k = j - 1; k >= 0; --k) {
+                if (i == j) sum += tmp(i, k) * tmp(i, k);
+                else sum += tmp(i, k) * tmp(j, k);
+            }
+            if (i == j) tmp(j, j) = sqrt(data[j][j] - sum);
+            else tmp(i, j) = (data[i][j] - sum) / tmp(j, j);
+        }
+    }
+    L = tmp;
+    L_t = transpos(tmp);
+    return true;
+}
+bool Matrix::find_QR_matrix(Matrix& Q, Matrix& R) {
+    if (getCols() != getRows()) {
+        cout << "    Error: wrong size for QR_matrix\n\n";
+        return false;
+    }
+    size_t n = getRows();
+    Matrix T = Matrix::unit_matr(n), T_ij, tmp_A(data);
+    double c, s, a;
+    for (size_t j = 0; j < n - 1; j++) {
+        for (size_t i = j + 1; i < n; i++) {
+            c = tmp_A(j, j) / sqrt(tmp_A(j, j) * tmp_A(j, j) + tmp_A(i, j) * tmp_A(i, j));
+            s = tmp_A(i, j) / sqrt(tmp_A(j, j) * tmp_A(j, j) + tmp_A(i, j) * tmp_A(i, j));
+            for (size_t k = j; k < n; ++k) {
+                a = tmp_A(j, k);
+                tmp_A(j, k) = c * tmp_A(j, k) + s * tmp_A(i, k);
+                tmp_A(i, k) = -s * a + c * tmp_A(i, k);
+            }
+            T_ij = Matrix::unit_matr(n);
+            T_ij(j, j) = c;
+            T_ij(i, i) = c;
+            T_ij(j, i) = s;
+            T_ij(i, j) = -s;
+            T = T_ij * T;
+        }
+    }
+    tmp_A.data = data;
+    R = T * tmp_A;
+    Q = transpos(T);
+    return true;
+}
 
 
 Matrix inverse(Matrix& m) {
@@ -320,108 +417,6 @@ Matrix transpos(Matrix& m) {
     }
     return tmp;
 }
-double determinant(Matrix& m) {
-    if (m.getCols() != m.getRows()) return 0;
-    Matrix tmp = m;
-    size_t n = m.getCols();
-    double det = 1;
-    for (size_t K = 0; K < n; K++) {
-        if (mod_max_row(tmp, K)) det = -det;
-        det *= tmp.data[K][K];
-        do_zero_under_diag(tmp, K);
-    }
-    return det;
-}
-double determinant_with_LU(Matrix& m) {
-    Matrix L, U;
-    if (!find_LU_matrix(m, L, U)) return 0;
-    else return determinant(U);
-}
-
-bool find_LU_matrix(Matrix& A, Matrix& L, Matrix& U) {
-    if (A.getCols() != A.getRows()) {
-        cout << "    Error: wrong size for LU_matrix\n\n";
-        return false;
-    }
-    size_t n = A.getRows();
-    Matrix tmp_U = A, tmp_L = Matrix::unit_matr(n);
-    for (size_t K = 0; K < n-1; K++) {
-        if (!do_zero_under_diag_for_LU(tmp_U, K, tmp_L)) {
-            cout << "    Error: LU is impossible\n\n";
-            return false;
-        }
-    }
-    L = tmp_L;
-    U = tmp_U;
-    return true;
-}
-bool find_P_matrix(Matrix& A, Matrix& P) {
-    if (A.getCols() != A.getRows()) {
-        cout << "    Error: wrong size for P_matrix\n\n";
-        return false;
-    }
-    size_t n = A.getRows(), Nmax;
-    Matrix tmp_A = A, tmp_P = Matrix::unit_matr(n);
-    for (size_t K = 0; K < n - 1; K++) {
-        Nmax = mod_max_row(tmp_A, K);
-        if (Nmax) tmp_P.swap_rows(K, Nmax);
-    }
-    P = tmp_P;
-    return true;
-}
-bool find_L_Lt_matrix(Matrix& A, Matrix& L, Matrix& L_t) {
-    if (A.getRows() == 1 || !A.is_symmetry() || !A.is_positive_definite()) {
-        cout << "    Error: Cholesky decomposition is impossible\n\n";
-        return false;
-    }
-    size_t n = A.getCols();
-    Matrix tmp(n);
-    double sum;
-    for (size_t j = 0; j < n; ++j) {
-        for (size_t i = j; i < n; ++i) {
-            sum = 0;
-            for (int k = j-1; k >= 0; --k) {
-                if (i == j) sum += tmp(i, k) * tmp(i, k);
-                else sum += tmp(i, k) * tmp(j, k);
-            }
-            if (i == j) tmp(j,j) = sqrt(A(j,j)-sum);
-            else tmp(i,j) = (A(i,j) - sum)/tmp(j,j);
-        }
-    }
-    L = tmp;
-    L_t = transpos(tmp);
-    return true;
-}
-bool find_QR_matrix(Matrix& A, Matrix& Q, Matrix& R) {
-    if (A.getCols() != A.getRows()) {
-        cout << "    Error: wrong size for QR_matrix\n\n";
-        return false;
-    }
-    size_t n = A.getRows();
-    Matrix T = Matrix::unit_matr(n), T_ij, tmp_A = A;
-    double c, s, a;
-    for (size_t j = 0; j < n - 1; j++) {
-        for (size_t i = j + 1; i < n; i++) {
-            c = tmp_A(j, j) / sqrt(tmp_A(j, j) * tmp_A(j, j) + tmp_A(i, j) * tmp_A(i, j));
-            s = tmp_A(i, j) / sqrt(tmp_A(j, j) * tmp_A(j, j) + tmp_A(i, j) * tmp_A(i, j));
-            for (size_t k = j; k < n; ++k) {
-                a = tmp_A(j, k);
-                tmp_A(j, k) = c * tmp_A(j, k) + s * tmp_A(i, k);
-                tmp_A(i, k) = -s * a + c * tmp_A(i, k);
-            }
-            T_ij = Matrix::unit_matr(n);
-            T_ij(j, j) = c;
-            T_ij(i, i) = c;
-            T_ij(j, i) = s;
-            T_ij(i, j) = -s;
-            T = T_ij * T;
-        }
-    }
-    R = T * A;
-    Q = transpos(T);
-    return true;
-}
-
 vctr SLAE(Matrix& mtr) {
     if (mtr.getCols() != mtr.getRows() + 1) {
         cout << "    Error: wrong size for SLAE\n\n";
@@ -467,7 +462,7 @@ vctr SLAE_LU(Matrix& mtr, vctr& b) {
         return NULL;
     }
     Matrix A = mtr, L, U;
-    if (!find_LU_matrix(A, L, U)) return NULL;
+    if (!A.find_LU_matrix(L, U)) return NULL;
     else return SLAE_LU(L, U, b);
 }
 vctr SLAE_LU(Matrix& L, Matrix& U, vctr& b) {
@@ -493,7 +488,7 @@ vctr SLAE_LUP(Matrix& mtr, vctr& b) {
         return NULL;
     }
     Matrix A = mtr, L, U, P; 
-    if (!find_P_matrix(A, P) || !find_LU_matrix((A = P*A), L, U)) return NULL;
+    if (!A.find_P_matrix(P) || !(P*A).find_LU_matrix(L, U)) return NULL;
     size_t n = A.getRows();
     Matrix B = P * b;
     vctr pb(0), y(0), x(0);
@@ -514,7 +509,7 @@ vctr SLAE_Cholesky(Matrix& mtr, vctr& b) {
         return NULL;
     }
     Matrix A = mtr, L, L_t;
-    if (!find_L_Lt_matrix(A, L, L_t)) return NULL;
+    if (!A.find_L_Lt_matrix(L, L_t)) return NULL;
     else return SLAE_Cholesky(L, L_t, b);
 }
 vctr SLAE_Cholesky(Matrix& L, Matrix& L_t, vctr& b) {
@@ -564,7 +559,7 @@ vctr SLAE_QR(Matrix& mtr, vctr& b) {
         return NULL;
     }
     Matrix A = mtr, Q, R;
-    if (!find_QR_matrix(A, Q, R)) return NULL;
+    if (!A.find_QR_matrix(Q, R)) return NULL;
     else return SLAE_QR(Q, R, b);
 }
 vctr SLAE_QR(Matrix& Q, Matrix& R, vctr& b) {
@@ -599,13 +594,13 @@ vctr SLAE_Iteration(Matrix& A, vctr& b, double accuracy, vctr& initial_approxima
         else c(i, 0) = b.vec[i] / A(i, i);
     }
     Matrix B = B_matrix(A), x(initial_approximation), x_next = B * x;
-    double e1 = (1 - norm_first(B)) * accuracy / norm_first(B);
+    double e1 = (1 - B.norm_first()) * accuracy / B.norm_first();
     vctr ans;
-    cout << "\n\n-----Нормы матрицы B (first, Evkl, Infinity):    " << norm_first(B) << "    " << norm_evkl(B) << "    " << norm_infinity(B);
+    cout << "\n\n-----Нормы матрицы B (first, Evkl, Infinity):    " << B.norm_first() << "    " << B.norm_evkl() << "    " << B.norm_infinity();
     cout << "\n----------Начальное приближение:    " << initial_approximation << "\n";
 
     x_next = x_next + c;
-    while (norm_first(x = (x_next - x)) >= e1) {
+    while ((x_next - x).norm_first() >= e1) {
         x = x_next;
         x_next = B * x;
         x_next = x_next + c;
@@ -627,12 +622,12 @@ vctr SLAE_Seidel(Matrix& A, vctr& b, double accuracy, vctr& initial_approximatio
         }
         else c(i, 0) = b.vec[i] / A(i, i);
     }
-    Matrix B1, B2, B;
+    Matrix B1, B2;
     B1_B2_matrix(A, B1, B2);
-    double e2 = (1 - norm_first(B = B1+B2)) * accuracy / norm_first(B2);
+    double e2 = (1 - (B1 + B2).norm_first()) * accuracy / B2.norm_first();
     vctr x(initial_approximation), x_next(initial_approximation);
-    cout << "\n\n-----Нормы матрицы B1 (first, Evkl, Infinity):    " << norm_first(B1) << "    " << norm_evkl(B1) << "    " << norm_infinity(B1);
-    cout << "\n-----Нормы матрицы B2 (first, Evkl, Infinity):    " << norm_first(B2) << "    " << norm_evkl(B2) << "    " << norm_infinity(B2);
+    cout << "\n\n-----Нормы матрицы B1 (first, Evkl, Infinity):    " << B1.norm_first() << "    " << B1.norm_evkl() << "    " << B1.norm_infinity();
+    cout << "\n-----Нормы матрицы B2 (first, Evkl, Infinity):    " << B2.norm_first() << "    " << B2.norm_evkl() << "    " << B2.norm_infinity();
     cout << "\n----------Начальное приближение:    " << initial_approximation << "\n";
 
     for (int i = 0; i < n; ++i) {
