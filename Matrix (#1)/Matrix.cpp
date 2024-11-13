@@ -456,13 +456,13 @@ vctr SLAE(Matrix& mtr, int metod) {             // 0 - строки, 1 - столбцы, 2 - 
     vctr v(ans, 0);
     return v;
 }
-vctr SLAE_LU(Matrix& mtr, vctr& b) {
-    if (mtr.getCols() != mtr.getRows() || b.vec.size() != mtr.getRows()) {
+vctr SLAE_LU(Matrix& A, vctr& b) {
+    if (A.getCols() != A.getRows() || b.vec.size() != A.getRows()) {
         cout << "    Error: wrong size for SLAE_LU without vector b or wrong vector b\n\n";
         return NULL;
     }
-    Matrix A = mtr, L, U;
-    if (!A.find_LU_matrix(L, U)) return NULL;
+    Matrix tmp_A = A, L, U;
+    if (!tmp_A.find_LU_matrix(L, U)) return NULL;
     else return SLAE_LU(L, U, b);
 }
 vctr SLAE_LU(Matrix& L, Matrix& U, vctr& b) {
@@ -482,14 +482,14 @@ vctr SLAE_LU(Matrix& L, Matrix& U, vctr& b) {
     for (size_t i = 0; i < n; ++i) x.vec.push_back(tmp(i, n));
     return x;
 }
-vctr SLAE_LUP(Matrix& mtr, vctr& b) {
-    if (mtr.getCols() != mtr.getRows() || b.vec.size() != mtr.getRows()) {
+vctr SLAE_LUP(Matrix& A, vctr& b) {
+    if (A.getCols() != A.getRows() || b.vec.size() != A.getRows()) {
         cout << "    Error: wrong size for SLAE_LUP without vector b or wrong vector b\n\n";
         return NULL;
     }
-    Matrix A = mtr, L, U, P; 
-    if (!A.find_P_matrix(P) || !(P*A).find_LU_matrix(L, U)) return NULL;
-    size_t n = A.getRows();
+    Matrix tmp_A = A, L, U, P;
+    if (!tmp_A.find_P_matrix(P) || !(P*tmp_A).find_LU_matrix(L, U)) return NULL;
+    size_t n = tmp_A.getRows();
     Matrix B = P * b;
     vctr pb(0), y(0), x(0);
     for (size_t i = 0; i < n; ++i) pb.vec.push_back(B(i, 0));
@@ -503,13 +503,13 @@ vctr SLAE_LUP(Matrix& mtr, vctr& b) {
     for (size_t i = 0; i < n; ++i) x.vec.push_back(tmp(i, n));
     return x;
 }
-vctr SLAE_Cholesky(Matrix& mtr, vctr& b) {
-    if (mtr.getCols() != mtr.getRows() || b.vec.size() != mtr.getRows()) {
+vctr SLAE_Cholesky(Matrix& A, vctr& b) {
+    if (A.getCols() != A.getRows() || b.vec.size() != A.getRows()) {
         cout << "    Error: wrong size for SLAE_Cholesky without vector b or wrong vector b\n\n";
         return NULL;
     }
-    Matrix A = mtr, L, L_t;
-    if (!A.find_L_Lt_matrix(L, L_t)) return NULL;
+    Matrix tmp_A = A, L, L_t;
+    if (!tmp_A.find_L_Lt_matrix(L, L_t)) return NULL;
     else return SLAE_Cholesky(L, L_t, b);
 }
 vctr SLAE_Cholesky(Matrix& L, Matrix& L_t, vctr& b) {
@@ -553,13 +553,13 @@ vctr SLAE_Tomas(Matrix& A, vctr& b) {
     vctr answer(x, 0);
     return answer;
 }
-vctr SLAE_QR(Matrix& mtr, vctr& b) {
-    if (mtr.getCols() != mtr.getRows() || b.vec.size() != mtr.getRows()) {
+vctr SLAE_QR(Matrix& A, vctr& b) {
+    if (A.getCols() != A.getRows() || b.vec.size() != A.getRows()) {
         cout << "    Error: wrong size for SLAE_QR without vector b or wrong vector b\n\n";
         return NULL;
     }
-    Matrix A = mtr, Q, R;
-    if (!A.find_QR_matrix(Q, R)) return NULL;
+    Matrix tmp_A = A, Q, R;
+    if (!tmp_A.find_QR_matrix(Q, R)) return NULL;
     else return SLAE_QR(Q, R, b);
 }
 vctr SLAE_QR(Matrix& Q, Matrix& R, vctr& b) {

@@ -1,21 +1,21 @@
 #include "vctr.h"
 
-double norm_first(vctr& v) {
+double vctr::norm_first() {
 	double s = 0;
-	for (int i = 0; i < v.vec.size(); ++i)
-		s += fabs(v.vec[i]);
+	for (int i = 0; i < vec.size(); ++i)
+		s += fabs(vec[i]);
 	return s;
 };
-double norm_second(vctr& v) {
+double vctr::norm_second() {
 	double s = 0;
-	for (int i = 0; i < v.vec.size(); ++i)
-		s += v.vec[i] * v.vec[i];
+	for (int i = 0; i < vec.size(); ++i)
+		s += vec[i] * vec[i];
 	return sqrt(s);
 }
-double norm_infinity(vctr& v) {
+double vctr::norm_infinity() {
 	double m = 0;
-	for (int i = 0; i < v.vec.size(); ++i)
-		if (fabs(v.vec[i]) > m) m = fabs(v.vec[i]);
+	for (int i = 0; i < vec.size(); ++i)
+		if (fabs(vec[i]) > m) m = fabs(vec[i]);
 	return m;
 }
 

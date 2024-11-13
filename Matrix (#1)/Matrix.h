@@ -18,6 +18,7 @@ class Matrix {
 		size_t getRows() const { return data.size(); }
 		size_t getCols() const { return data[0].size(); }
 		double& operator()(size_t row, size_t col) { return data[row][col]; }
+		vctr to_vector();										// перевод матрицы в вектор (строку или столбец), если это возможно
 
 		void changeRow(size_t r);								// количество строк = r. Заполняет нулями, если матрица увеличилась
 		void changeCol(size_t с);								// количество столбцов = с. Заполняет нулями, если матрица увеличилась
@@ -26,7 +27,6 @@ class Matrix {
 		bool is_symmetry();										// проверка матрицы на симметричность
 		bool is_positive_definite();							// проверка матрицы на положительную определённость
 		bool is_tridiagonal();									// проверка матрицы на тридиагональность
-		vctr to_vector();										// перевод матрицы в вектор (строку или столбец), если это возможно
 
 		double norm_first();												// вычисление абсолютной (1-нормы)
 		double norm_infinity();												// вычисление  максимальной (inf-нормы)
@@ -45,13 +45,13 @@ class Matrix {
 		friend Matrix transpos(Matrix& m);									// транспозиция
 		friend vctr SLAE(Matrix& mtr);										// решение СЛАУ, поиск главного элемента по строкам
 		friend vctr SLAE(Matrix& mtr, int metod);							// решение СЛАУ с выбором метода поиска главного элемента: 0 - по строкам, 1 - по столбцам, 2 - по строкам и столбцам
-		friend vctr SLAE_LU(Matrix& mtr, vctr& b);							// решение СЛАУ с помощью LU разложения
+		friend vctr SLAE_LU(Matrix& A, vctr& b);							// решение СЛАУ с помощью LU разложения
 		friend vctr SLAE_LU(Matrix& L, Matrix& U, vctr& b);					// решение СЛАУ с помощью LU разложения
-		friend vctr SLAE_LUP(Matrix& mtr, vctr& b);							// решение СЛАУ с помощью LUР разложения
-		friend vctr SLAE_Cholesky(Matrix& mtr, vctr& b);					// решение СЛАУ методом Холецкого
+		friend vctr SLAE_LUP(Matrix& A, vctr& b);							// решение СЛАУ с помощью LUР разложения
+		friend vctr SLAE_Cholesky(Matrix& A, vctr& b);						// решение СЛАУ методом Холецкого
 		friend vctr SLAE_Cholesky(Matrix& L, Matrix& L_t, vctr& b);			// решение СЛАУ методом Холецкого
-		friend vctr SLAE_Tomas(Matrix& mtr, vctr& b);						// решение СЛАУ для тридиагональных матриц методом Томаса (прогонки)
-		friend vctr SLAE_QR(Matrix& mtr, vctr& b);							// решение СЛАУ с помощью QR разложения
+		friend vctr SLAE_Tomas(Matrix& A, vctr& b);							// решение СЛАУ для тридиагональных матриц методом Томаса (прогонки)
+		friend vctr SLAE_QR(Matrix& A, vctr& b);							// решение СЛАУ с помощью QR разложения
 		friend vctr SLAE_QR(Matrix& Q, Matrix& R, vctr& b);					// решение СЛАУ с помощью QR разложения
 		friend vctr SLAE_Iteration(Matrix& A, vctr& b, double accuracy, vctr& initial_approximation);		// решение СЛАУ методом простой итерации
 		friend vctr SLAE_Seidel(Matrix& A, vctr& b, double accuracy, vctr& initial_approximation);			// решение СЛАУ методом Зейделя

@@ -15,9 +15,9 @@ class vctr {
 		vctr(vector <double> v, bool row) : vec(v), as_row(row) {}
 		void trans() { as_row = !as_row; }
 
-		friend double norm_first(vctr& v);
-		friend double norm_second(vctr& v);
-		friend double norm_infinity(vctr& v);
+		double norm_first();
+		double norm_second();
+		double norm_infinity();
 
 		friend vctr transpos(vctr& v);
 		friend vctr operator*(double A, vctr& v);
