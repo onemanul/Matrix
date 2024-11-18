@@ -268,6 +268,18 @@ void Zadanie_7() {
     cout << "\n\nВектор x: " << x << "Вторая норма вектора x: " << x.norm_second() << "\n";
     cout << (tmp = c * x) << (tmp = x * lambda);
 }
+void Zadanie_8() {
+    vctr x, tmp, tmp1;
+    Matrix c = Matrix::rand_matr(7, 7);
+    double accuracy = 0.000001, lambda = c.power_law_method_with_normalization(accuracy, x);
+    x = c.reverse_iterations_method(lambda);
+    cout << "Матрица А:\n" << c << "Собственное число: " << lambda << "\nНайденный собственный вектор e: " << x;
+    cout << "Его вторая норма: " << x.norm_second() << "\n\nПроверка:\n" << (tmp = (c * x).to_vector()) << (tmp1 = x * lambda) << (tmp1 = tmp - tmp1) << "\n\n\n";
+
+    x = c.reverse_iterations_method_Rayleigh(lambda);
+    cout << "\nНайденное собственное число: " << lambda << "\nНайденный собственный вектор e: " << x << "Его вторая норма: " << x.norm_second();
+    cout << "\n\nПроверка:\n" << (tmp = (c * x).to_vector()) << (tmp1 = x * lambda) << (tmp1 = tmp - tmp1);
+}
 
 int main() {
     setlocale(LC_ALL, "Russian");
@@ -284,24 +296,13 @@ int main() {
             {0.1, 0.1, 0.1, 0.4, 0.2},
             {0.1, 0.1, 0.1, 0.1, 0.5}
     };
-    Matrix c = Matrix::rand_matr(7,7), d(A), q, r;
+    Matrix d = Matrix::rand_matr(7,7), c(C), q, r;
     
     /*for (int i = 0; i < 100; ++i) {
         a.find_QR_matrix(q, r);
         a = r * q;
     }
     cout << a;*/
-
-    
-    double accuracy = 0.000001, lambda = c.power_law_method_with_normalization(accuracy, x);
-    x = c.reverse_iterations_method(lambda);
-    cout << "Матрица А:\n" << c  << "Собственное число: " << lambda << "\nНайденный собственный вектор e: " << x;
-    cout << "Его вторая норма: " << x.norm_second() << "\n\nПроверка:\n" << (tmp = (c * x).to_vector()) << (tmp1 = x * lambda) << (tmp1 = tmp-tmp1) << "\n\n\n";
-    
-    x = c.reverse_iterations_method_Rayleigh(lambda);
-    cout << "\nНайденное собственное число: " << lambda << "\nНайденный собственный вектор e: " << x << "Его вторая норма: " << x.norm_second();
-    cout << "\n\nПроверка:\n" << (tmp = (c * x).to_vector()) << (tmp1 = x * lambda) << (tmp1 = tmp - tmp1);
-    
 
 return 0;
 }

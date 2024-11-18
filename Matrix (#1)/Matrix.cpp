@@ -456,8 +456,8 @@ vctr Matrix::reverse_iterations_method_Rayleigh(double& l) {
     }
     Matrix A(data), tmpM, E = Matrix::unit_matr(getRows());
     vctr x(false), x_last, y, tmpV;
-    int r;
-    double lambda, q;
+    double lambda;
+    int okr; // для проверки на округление до единицы
     for (size_t i = 0; i < getRows(); ++i) 
         x.vec.push_back(1);
     power_law_method_with_normalization(0.00001, x);
@@ -468,8 +468,8 @@ vctr Matrix::reverse_iterations_method_Rayleigh(double& l) {
         tmpM = lambda * E;
         y = SLAE_QR((tmpM = A - tmpM), x);
         x = y / y.norm_second(); 
-        r = fabs(x_last * x) + 0.5;
-    } while (r != 1);
+        okr = fabs(x_last * x) + 0.00001;
+    } while (okr != 1);
     l = lambda;
     return x;
 }

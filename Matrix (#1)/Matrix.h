@@ -42,8 +42,8 @@ class Matrix {
 
 		double power_law_method(double accuracy, vctr& x_next);							// нахождения собственного значения с максимальной абсолютной величиной; условие: |λ| < 1
 		double power_law_method_with_normalization(double accuracy, vctr& x_next);		// нахождения собственного значения с максимальной абсолютной величиной; для любых λ
-		vctr reverse_iterations_method(double lambda);
-		vctr reverse_iterations_method_Rayleigh(double& lambda);
+		vctr reverse_iterations_method(double lambda);						// нахождение собственного вектора по собственному числу методом обратных итераций
+		vctr reverse_iterations_method_Rayleigh(double& l);					// нахождение собственного числа и собственного вектора методом обратных итераций с использованием отношение Рэлея
 
 
 		friend Matrix inverse(Matrix& m);									// обратная матрица
