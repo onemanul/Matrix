@@ -40,6 +40,11 @@ class Matrix {
 		bool find_P_matrix(Matrix& P);										// нахождение матрицы перестановок Р для матрицы А
 		bool find_L_Lt_matrix(Matrix& L, Matrix& L_t);						// нахождение матриц L и L_t для метода Холецкого
 
+		double power_law_method(double accuracy, vctr& x_next);							// нахождения собственного значения с максимальной абсолютной величиной; условие: |λ| < 1
+		double power_law_method_with_normalization(double accuracy, vctr& x_next);		// нахождения собственного значения с максимальной абсолютной величиной; для любых λ
+		vctr reverse_iterations_method(double lambda);
+		vctr reverse_iterations_method_Rayleigh(double& lambda);
+
 
 		friend Matrix inverse(Matrix& m);									// обратная матрица
 		friend Matrix transpos(Matrix& m);									// транспозиция
@@ -54,10 +59,7 @@ class Matrix {
 		friend vctr SLAE_QR(Matrix& A, vctr& b);							// решение СЛАУ с помощью QR разложения
 		friend vctr SLAE_QR(Matrix& Q, Matrix& R, vctr& b);					// решение СЛАУ с помощью QR разложения
 		friend vctr SLAE_Iteration(Matrix& A, vctr& b, double accuracy, vctr& initial_approximation);		// решение СЛАУ методом простой итерации
-		friend vctr SLAE_Seidel(Matrix& A, vctr& b, double accuracy, vctr& initial_approximation);			// решение СЛАУ методом Зейделя
-
-		friend double power_law_method(Matrix& A, double accuracy, vctr& x_next);							// нахождения собственного значения с максимальной абсолютной величиной; условие: |λ| < 1
-		friend double power_law_method_with_normalization(Matrix& A, double accuracy, vctr& x_next);		// нахождения собственного значения с максимальной абсолютной величиной; для любых λ
+		friend vctr SLAE_Seidel(Matrix& A, vctr& b, double accuracy, vctr& initial_approximation);			// решение СЛАУ методом Зейделя	
 
 
 		//------------------------------Переопределение операторов------------------------------

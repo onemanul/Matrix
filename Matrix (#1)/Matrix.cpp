@@ -95,7 +95,7 @@ vctr Matrix::to_vector() {
 }
 
 
-// Нужны для обратной, определителя, решений СЛАУ-------------------
+//---------------Вспомогательные функции, нужны для обратной, определителя, решений СЛАУ---------------
 int mod_max_row(Matrix& tmp, size_t K) {                   // |max| по главной диагонали, меняя строки. K - от какой строки вниз. При смене строк det меняет знак
     size_t Nmax = K, n = tmp.getRows(), m = tmp.getCols();
     for (size_t i = K + 1; i < n; i++) {
@@ -243,7 +243,7 @@ void B1_B2_matrix(Matrix& A, Matrix& B1, Matrix& B2) {
     }
     B1 = B;
 }
-// ----------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------
 
 
 double Matrix::norm_first() {
@@ -387,7 +387,94 @@ bool Matrix::find_QR_matrix(Matrix& Q, Matrix& R) {
     return true;
 }
 
+double Matrix::power_law_method(double accuracy, vctr& x_next) {
+    if (getCols() != getRows()) {
+        cout << "    Error: wrong size for power_law_method\n\n";
+        return NULL;
+    }
+    Matrix A(data);
+    vctr x(false);
+    double lambda = 1, lambda_next;
+    for (size_t i = 0; i < getRows(); ++i) x.vec.push_back(1);
 
+    x_next = (A * x).to_vector();
+    lambda_next = (x_next * x) / (x * x);
+    while (fabs(lambda_next - lambda) > accuracy) {
+        x = x_next;
+        lambda = lambda_next;
+        x_next = (A * x).to_vector();
+        lambda_next = (x_next * x) / (x * x);
+    }
+    return lambda_next;
+}
+double Matrix::power_law_method_with_normalization(double accuracy, vctr& x_next) {
+    if (getCols() != getRows()) {
+        cout << "    Error: wrong size for power_law_method_with_normalization\n\n";
+        return NULL;
+    }
+    Matrix A(data);
+    vctr x(false);
+    double lambda = 1, lambda_next;
+    for (size_t i = 0; i < getRows(); ++i) x.vec.push_back(1);
+
+    x_next = (A * x).to_vector();
+    lambda_next = x_next * x;
+    x = x_next / x_next.norm_second();
+    while (fabs(lambda_next - lambda) > accuracy) {
+        lambda = lambda_next;
+        x_next = (A * x).to_vector();
+        lambda_next = x_next * x;
+        x = x_next / x_next.norm_second();
+    }
+    x_next = x;
+    return lambda_next;
+}
+
+vctr Matrix::reverse_iterations_method(double lambda) {
+    if (getCols() != getRows()) {
+        cout << "    Error: wrong size for reverse_iterations_method\n\n";
+        return NULL;
+    }
+    size_t n = getCols();
+    Matrix A(data), M(data);
+    vctr x(false), y, tmp;
+    for (size_t i = 0; i < n; ++i) {
+        x.vec.push_back(1);
+        A(i, i) -= lambda;
+    }
+    do {
+        tmp = x;
+        y = SLAE_QR(A, x);
+        x = y / y.norm_second();
+    } while (fabs(tmp*x) != 1);
+    return x;
+}
+vctr Matrix::reverse_iterations_method_Rayleigh(double& l) {
+    if (getCols() != getRows()) {
+        cout << "    Error: wrong size for reverse_iterations_method_Rayleigh\n\n";
+        return NULL;
+    }
+    Matrix A(data), tmpM, E = Matrix::unit_matr(getRows());
+    vctr x(false), x_last, y, tmpV;
+    int r;
+    double lambda, q;
+    for (size_t i = 0; i < getRows(); ++i) 
+        x.vec.push_back(1);
+    power_law_method_with_normalization(0.00001, x);
+    do {
+        x_last = x;
+        tmpV = (A * x).to_vector();
+        lambda = tmpV * x;
+        tmpM = lambda * E;
+        y = SLAE_QR((tmpM = A - tmpM), x);
+        x = y / y.norm_second(); 
+        r = fabs(x_last * x) + 0.5;
+    } while (r != 1);
+    l = lambda;
+    return x;
+}
+
+//-----------------------------------------FRIEND-----------------------------------------
 Matrix inverse(Matrix& m) {
     if (m.getCols() != m.getRows()) {
         cout << "    Error: rows != cols for inverse\n\n";
@@ -610,7 +697,7 @@ vctr SLAE_Iteration(Matrix& A, vctr& b, double accuracy, vctr& initial_approxima
 }
 vctr SLAE_Seidel(Matrix& A, vctr& b, double accuracy, vctr& initial_approximation) {
     if (A.getCols() != A.getRows() || b.vec.size() != A.getRows() || initial_approximation.vec.size() != A.getRows()) {
-        cout << "    Error: wrong size of matrix A or vector b for SLAE_Iteration\n\n";
+        cout << "    Error: wrong size of matrix A or vector b for SLAE_Seidel\n\n";
         return NULL;
     }
     int n = A.getRows(), k = 0;
@@ -640,7 +727,7 @@ vctr SLAE_Seidel(Matrix& A, vctr& b, double accuracy, vctr& initial_approximatio
         x_next.vec[i] += c(i, 0);
     }
     cout << "Итерация " << ++k << ":  " << x_next;
-    while (norm_first(x = (x_next - x)) >= e2) {
+    while ((x_next - x).norm_first() >= e2) {
         x = x_next;
         for (int i = 0; i < n; ++i) { //x(i,0)
             x_next.vec[i] = 0;
@@ -655,56 +742,9 @@ vctr SLAE_Seidel(Matrix& A, vctr& b, double accuracy, vctr& initial_approximatio
     }
     return x_next;
 }
+//----------------------------------------------------------------------------------------
 
-double power_law_method(Matrix& A, double accuracy, vctr& x_next) {
-    if (A.getCols() != A.getRows()) {
-        cout << "    Error: wrong size of matrix A or vector b for SLAE_Iteration\n\n";
-        return NULL;
-    }
-    vctr x(false);
-    double lambda = 1, lambda_next;
-    int k = 0;
-    for (size_t i = 0; i < A.getRows(); ++i) x.vec.push_back(1);
-
-    x_next = (A * x).to_vector();
-    lambda_next = (x_next * x)/(x*x);
-    cout << "Итерация " << ++k << "\nСобственное число : " << lambda_next << "\nВектор: " << x_next;
-    while (fabs(lambda_next-lambda) > accuracy) {
-        x = x_next;
-        lambda = lambda_next;
-        x_next = (A * x).to_vector();
-        lambda_next = (x_next * x) / (x * x);
-        cout << "Итерация " << ++k << "\nСобственное число : " << lambda_next << "\nВектор: " << x_next;
-    }
-    return lambda_next;
-}
-double power_law_method_with_normalization(Matrix& A, double accuracy, vctr& x_next) {
-    if (A.getCols() != A.getRows()) {
-        cout << "    Error: wrong size of matrix A or vector b for SLAE_Iteration\n\n";
-        return NULL;
-    }
-    vctr x(false);
-    double lambda = 1, lambda_next;
-    int k = 0;
-    for (size_t i = 0; i < A.getRows(); ++i) x.vec.push_back(1);
-
-    x_next = (A * x).to_vector();
-    lambda_next = x_next * x;
-    x = x_next / norm_second(x_next);
-    cout << "Итерация " << ++k << "\nСобственное число : " << lambda_next << "\nВектор: " << x_next;
-    while (fabs(lambda_next - lambda) > accuracy) {
-        lambda = lambda_next;
-        x_next = (A * x).to_vector();
-        lambda_next = x_next * x;
-        x = x_next / norm_second(x_next);
-        cout << "Итерация " << ++k << "\nСобственное число : " << lambda_next << "\nВектор: " << x_next;
-    }
-    x_next = x;
-    return lambda_next;
-}
-
-
-//------------------------------Переопределение операторов------------------------------
+//------------------------------Переопределение операторов--------------------------------
 Matrix operator*(double A, Matrix& m) {
     Matrix tmp = m;
     for (int i = 0; i < tmp.getRows(); ++i) {

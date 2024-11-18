@@ -64,6 +64,9 @@ bool operator==(const vctr& left, const vctr& right) {
 	}
 	return true;
 }
+bool operator!=(const vctr& left, const vctr& right) {
+	return !(left == right);
+}
 ostream& operator<<(ostream& out, vctr& v) {
 	for (int i = 0; i < v.vec.size(); ++i)
 		out << v.vec[i] << " ";

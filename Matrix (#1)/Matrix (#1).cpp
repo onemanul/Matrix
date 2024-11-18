@@ -250,45 +250,58 @@ void Zadanie_7() {
     Matrix a(A), c(C), tmp;
 
     cout << "-----СОБСТВЕННОЕ ЧИСЛО: 4.78303228 --------\n";
-    double lambda = power_law_method(a, 0.000001, x);
-    cout << "\n\nВектор x: " << x << "Вторая норма вектора x: " << norm_second(x) << "\n";
+    double lambda = a.power_law_method(0.000001, x);
+    cout << "\n\nВектор x: " << x << "Вторая норма вектора x: " << x.norm_second() << "\n";
     cout << (tmp = a * x) << (tmp = x * lambda);
 
-    lambda = power_law_method_with_normalization(a, 0.000001, x);
-    cout << "\n\nВектор x: " << x << "Вторая норма вектора x: " << norm_second(x) << "\n";
+    lambda = a.power_law_method_with_normalization(0.000001, x);
+    cout << "\n\nВектор x: " << x << "Вторая норма вектора x: " << x.norm_second() << "\n";
     cout << (tmp = a * x) << (tmp = x * lambda);
 
 
     cout << "\n\n-----СОБСТВЕННОЕ ЧИСЛО: 0.96118587 --------\n";
-    lambda = power_law_method(c, 0.000001, x);
-    cout << "\n\nВектор x: " << x << "Вторая норма вектора x: " << norm_second(x) << "\n";
+    lambda = c.power_law_method(0.000001, x);
+    cout << "\n\nВектор x: " << x << "Вторая норма вектора x: " << x.norm_second() << "\n";
     cout << (tmp = c * x) << (tmp = x * lambda);
 
-    lambda = power_law_method_with_normalization(c, 0.000001, x);
-    cout << "\n\nВектор x: " << x << "Вторая норма вектора x: " << norm_second(x) << "\n";
+    lambda = c.power_law_method_with_normalization(0.000001, x);
+    cout << "\n\nВектор x: " << x << "Вторая норма вектора x: " << x.norm_second() << "\n";
     cout << (tmp = c * x) << (tmp = x * lambda);
 }
 
 int main() {
     setlocale(LC_ALL, "Russian");
-    vctr x, b({ 1.058, 2.155626, -0.15626, -8.100005, 5.102034 }, 0);
-    vector<vector<double>> A = {
-        {3.2, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0},
-        {0.5, 2.8, 0.7, 0.0, 0.0, 0.0, 0.0},
-        {0.0, 0.7, 2.1, 0.9, 0.0, 0.0, 0.0},
-        {0.0, 0.0, 0.9, 3.5, 1.1, 0.0, 0.0},
-        {0.0, 0.0, 0.0, 1.1, 2.9, 0.8, 0.0},
-        {0.0, 0.0, 0.0, 0.0, 0.8, 3.2, 0.6},
-        {0.0, 0.0, 0.0, 0.0, 0.0, 0.6, 4.1}
-    },
+    vctr x, tmp, tmp1;
+    vector<vector<double>> A = { {4.82, -0.31, -0.49, 0.13, -0.27},
+                                {-0.55, 3.19, -0.11, -0.47, 0.38},
+                                {-0.29, -0.43, 2.91, -0.19, 0.51},
+                                {0.49, -0.17, -0.35, 4.13, -0.41},
+                                {-0.11, 0.53, -0.29, -0.31, 3.67} }, 
         C = {
             {0.5, 0.2, 0.1, 0.1, 0.1},
             {0.1, 0.6, 0.1, 0.1, 0.1},
-            {0.1, 0.1, 0.5, 0.2, 0.1},
+            {0.1, 0.1, 0.5, 0.2, 0.1},  // [0.96118587 0.3729466  0.4        0.46586753 0.3       ]
             {0.1, 0.1, 0.1, 0.4, 0.2},
             {0.1, 0.1, 0.1, 0.1, 0.5}
     };
-    Matrix a(A), c(C), l, u, L, U, tmp;
+    Matrix c = Matrix::rand_matr(7,7), d(A), q, r;
     
-    return 0;
+    /*for (int i = 0; i < 100; ++i) {
+        a.find_QR_matrix(q, r);
+        a = r * q;
+    }
+    cout << a;*/
+
+    
+    double accuracy = 0.000001, lambda = c.power_law_method_with_normalization(accuracy, x);
+    x = c.reverse_iterations_method(lambda);
+    cout << "Матрица А:\n" << c  << "Собственное число: " << lambda << "\nНайденный собственный вектор e: " << x;
+    cout << "Его вторая норма: " << x.norm_second() << "\n\nПроверка:\n" << (tmp = (c * x).to_vector()) << (tmp1 = x * lambda) << (tmp1 = tmp-tmp1) << "\n\n\n";
+    
+    x = c.reverse_iterations_method_Rayleigh(lambda);
+    cout << "\nНайденное собственное число: " << lambda << "\nНайденный собственный вектор e: " << x << "Его вторая норма: " << x.norm_second();
+    cout << "\n\nПроверка:\n" << (tmp = (c * x).to_vector()) << (tmp1 = x * lambda) << (tmp1 = tmp - tmp1);
+    
+
+return 0;
 }
