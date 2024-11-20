@@ -14,6 +14,7 @@ class Matrix {
 		Matrix(vctr v);
 		static Matrix unit_matr(size_t n);						// tmp = Matrix::unit_matr(3)
 		static Matrix rand_matr(size_t rows, size_t cols);		// tmp = Matrix::rand_matr(3, 5)
+		static Matrix symmetry_matr(size_t rows, size_t cols);
 		
 		size_t getRows() const { return data.size(); }
 		size_t getCols() const { return data[0].size(); }
@@ -37,14 +38,15 @@ class Matrix {
 
 		bool find_LU_matrix(Matrix& L, Matrix& U);							// нахождение LU разложения матрицы А
 		bool find_QR_matrix(Matrix& Q, Matrix& R);							// нахождение QR разложения матрицы А
-		bool find_P_matrix(Matrix& P);										// нахождение матрицы перестановок Р для матрицы А
 		bool find_L_Lt_matrix(Matrix& L, Matrix& L_t);						// нахождение матриц L и L_t для метода Холецкого
+		Matrix find_P_matrix();												// нахождение матрицы перестановок Р для матрицы А
+		Matrix find_Hessenberg();
 
 		double power_law_method(double accuracy, vctr& x_next);							// нахождения собственного значения с максимальной абсолютной величиной; условие: |λ| < 1
 		double power_law_method_with_normalization(double accuracy, vctr& x_next);		// нахождения собственного значения с максимальной абсолютной величиной; для любых λ
 		vctr reverse_iterations_method(double lambda);						// нахождение собственного вектора по собственному числу методом обратных итераций
 		vctr reverse_iterations_method_Rayleigh(double& l);					// нахождение собственного числа и собственного вектора методом обратных итераций с использованием отношение Рэлея
-
+		Matrix QR_algorithm(double accuracy);
 
 		friend Matrix inverse(Matrix& m);									// обратная матрица
 		friend Matrix transpos(Matrix& m);									// транспозиция

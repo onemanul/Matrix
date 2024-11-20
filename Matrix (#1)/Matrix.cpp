@@ -23,6 +23,16 @@ Matrix Matrix::rand_matr(size_t rows, size_t cols) {
     }
     return m;
 }
+Matrix Matrix::symmetry_matr(size_t rows, size_t cols) {
+    Matrix m(rows, cols);
+    for (int i = 0; i < rows; ++i) {
+        for (int j = i; j < cols; ++j) {
+            m(i, j) = (double)(rand()) / (double)(RAND_MAX);
+            m(j, i) = m(i, j);
+        }
+    }
+    return m;
+}
 
 void Matrix::changeRow(size_t r) {
     vector<double> v(data[0].size(), 0);
@@ -319,19 +329,18 @@ bool Matrix::find_LU_matrix(Matrix& L, Matrix& U) {
     U = tmp_U;
     return true;
 }
-bool Matrix::find_P_matrix(Matrix& P) {
+Matrix Matrix::find_P_matrix() {
     if (getCols() != getRows()) {
         cout << "    Error: wrong size for P_matrix\n\n";
         return false;
     }
     size_t n = getRows(), Nmax;
-    Matrix tmp_A(data), tmp_P = Matrix::unit_matr(n);
+    Matrix A(data), P = Matrix::unit_matr(n);
     for (size_t K = 0; K < n - 1; K++) {
-        Nmax = mod_max_row(tmp_A, K);
-        if (Nmax) tmp_P.swap_rows(K, Nmax);
+        Nmax = mod_max_row(A, K);
+        if (Nmax) P.swap_rows(K, Nmax);
     }
-    P = tmp_P;
-    return true;
+    return P;
 }
 bool Matrix::find_L_Lt_matrix(Matrix& L, Matrix& L_t) {
     if (getRows() == 1 || !is_symmetry() || !is_positive_definite()) {
@@ -429,7 +438,6 @@ double Matrix::power_law_method_with_normalization(double accuracy, vctr& x_next
     x_next = x;
     return lambda_next;
 }
-
 vctr Matrix::reverse_iterations_method(double lambda) {
     if (getCols() != getRows()) {
         cout << "    Error: wrong size for reverse_iterations_method\n\n";
@@ -473,6 +481,53 @@ vctr Matrix::reverse_iterations_method_Rayleigh(double& l) {
     l = lambda;
     return x;
 }
+
+Matrix Matrix::QR_algorithm(double accuracy) {
+    if (getCols() != getRows()) {
+        cout << "    Error: wrong size for QR_algorithm\n\n";
+        return NULL;
+    }
+    Matrix A(data), Q(data), R, q;
+    int k = 0;
+    cout << A;
+    do {
+        q = Q;
+        A.find_QR_matrix(Q, R);
+        A = R*Q;
+    } while ((Q - q).norm_evkl() > accuracy);
+    return A;
+}
+
+Matrix Matrix::find_Hessenberg() {
+    if (getCols() != getRows()) {
+        cout << "    Error: wrong size for Hessenberg\n\n";
+        return false;
+    }
+    Matrix H(data), H_temp;
+    size_t n = getCols();
+    for (size_t k = 0; k < n - 2; ++k) {
+        vctr x;
+        for (int i = 0; i < k + 1; ++i)
+            x.vec.push_back(0);
+        for (int i = k + 1; i < n; ++i)
+            x.vec.push_back(H(i, k));
+        x.vec[k+1] += (x.vec[k+1] >= 0 ? x.norm_second() : -x.norm_second());
+        x = x / x.norm_second();
+
+        size_t m = x.vec.size();
+        Matrix Hk = Matrix::unit_matr(n);
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < m; ++j) {
+                Hk(i,j) -= 2 * x.vec[i] * x.vec[j];
+            }
+        }
+        H = Hk * H;
+        H = H * Hk;
+    }
+    return H;
+}
+
+
 
 //-----------------------------------------FRIEND-----------------------------------------
 Matrix inverse(Matrix& m) {
@@ -574,8 +629,8 @@ vctr SLAE_LUP(Matrix& A, vctr& b) {
         cout << "    Error: wrong size for SLAE_LUP without vector b or wrong vector b\n\n";
         return NULL;
     }
-    Matrix tmp_A = A, L, U, P;
-    if (!tmp_A.find_P_matrix(P) || !(P*tmp_A).find_LU_matrix(L, U)) return NULL;
+    Matrix tmp_A = A, L, U, P = tmp_A.find_P_matrix();
+    if (!(P*tmp_A).find_LU_matrix(L, U)) return NULL;
     size_t n = tmp_A.getRows();
     Matrix B = P * b;
     vctr pb(0), y(0), x(0);
