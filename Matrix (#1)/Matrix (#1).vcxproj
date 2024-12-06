@@ -128,12 +128,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Fredholm.cpp" />
     <ClCompile Include="Matrix (#1).cpp" />
     <ClCompile Include="Matrix.cpp" />
+    <ClCompile Include="ODY.cpp" />
     <ClCompile Include="vctr.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Fredholm.h" />
     <ClInclude Include="Matrix.h" />
+    <ClInclude Include="ODY.h" />
     <ClInclude Include="vctr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

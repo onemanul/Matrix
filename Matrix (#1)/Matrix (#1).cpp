@@ -1,7 +1,10 @@
 ﻿#include<iostream>
 #include"Matrix.h"
+#include "ODY.h"
+#include "Fredholm.h"
 #include <fstream>
 #include <random>
+
 using namespace std;
 /*
 double pre_estimate_slae(Matrix& m) {
@@ -280,43 +283,87 @@ void Zadanie_8() {
     cout << "\nНайденное собственное число: " << lambda << "\nНайденный собственный вектор e: " << x << "Его вторая норма: " << x.norm_second();
     cout << "\n\nПроверка:\n" << (tmp = (c * x).to_vector()) << (tmp1 = x * lambda) << (tmp1 = tmp - tmp1);
 }
-
-int main() {
-    setlocale(LC_ALL, "Russian");
-    vctr x;
+void Zadanie_9() {
     vector<vector<double>> A = { {4.82, -0.31, -0.49, 0.13, -0.27},
                                 {-0.55, 3.19, -0.11, -0.47, 0.38},  // 5.23475817+0.j         2.5831874 +0.j         4.16082728+0.j
                                 {-0.29, -0.43, 2.91, -0.19, 0.51},  // 3.37061357 + 0.27120622j           3.37061357 - 0.27120622j
                                 {0.49, -0.17, -0.35, 4.13, -0.41},
                                 {-0.11, 0.53, -0.29, -0.31, 3.67} },
-        C = {{0.5, 0.2, 0.1, 0.1, 0.1},
+        C = { {0.5, 0.2, 0.1, 0.1, 0.1},
              {0.1, 0.6, 0.1, 0.1, 0.1},
              {0.1, 0.1, 0.5, 0.2, 0.1},  // 0.96118587  0.46586753  0.4  0.3729466  0.3
              {0.1, 0.1, 0.1, 0.4, 0.2},
              {0.1, 0.1, 0.1, 0.1, 0.5} },
 
-    Z ={{4.5, 1.2, 0.5, 0.3, 0.1, 0.2, 0.4},
-        {1.2, 3.6, 0.7, 0.6, 0.2, 0.3, 0.5},
-        {0.5, 0.7, 5.0, 0.8, 0.4, 0.6, 0.7},    // 7.32036668  4.67493495  4.09818115  3.94948224  3.61991929  3.26455542  2.67256026
-        {0.3, 0.6, 0.8, 4.2, 0.5, 0.4, 0.3},
-        {0.1, 0.2, 0.4, 0.5, 3.8, 0.6, 0.4},
-        {0.2, 0.3, 0.6, 0.4, 0.6, 4.1, 0.5},
-        {0.4, 0.5, 0.7, 0.3, 0.4, 0.5, 4.4}};
+        Z = { {4.5, 1.2, 0.5, 0.3, 0.1, 0.2, 0.4},
+            {1.2, 3.6, 0.7, 0.6, 0.2, 0.3, 0.5},
+            {0.5, 0.7, 5.0, 0.8, 0.4, 0.6, 0.7},    // 7.32036668  4.67493495  4.09818115  3.94948224  3.61991929  3.26455542  2.67256026
+            {0.3, 0.6, 0.8, 4.2, 0.5, 0.4, 0.3},
+            {0.1, 0.2, 0.4, 0.5, 3.8, 0.6, 0.4},
+            {0.2, 0.3, 0.6, 0.4, 0.6, 4.1, 0.5},
+            {0.4, 0.5, 0.7, 0.3, 0.4, 0.5, 4.4} };
 
     double accuracy = 0.000001;
-    Matrix q = Matrix::symmetry_matr(7, 7), a(Z), tmp = a.find_Hessenberg().QR_algorithm(accuracy), tmp2 = a.QR_algorithm(accuracy);
+    Matrix q = Matrix::symmetry_matr(7, 7), a(A), c(C), z(Z), tmp1, tmp2;
+    vector<Matrix> mtr = { a, c, z };
 
-    cout << a.is_positive_definite() << "\n";
-
-    for (int i = 0; i < tmp.getCols(); ++i) {
-        cout << tmp(i, i) << "   ";
+    for (Matrix m : mtr) {
+        tmp1 = m.QR_algorithm(accuracy);
+        tmp2 = m.find_Hessenberg().QR_algorithm(accuracy);
+        cout << m.is_positive_definite() << "\n\n";
+        for (int i = 0; i < tmp1.getCols(); ++i) {
+            cout << tmp1(i, i) << "   ";
+        }
+        cout << "\n\n";
+        for (int i = 0; i < tmp2.getCols(); ++i) {
+            cout << tmp2(i, i) << "   ";
+        }
+        cout << "\n\n-----------------------------\n\n";
     }
-    cout << "\n\n";
+}
 
-    for (int i = 0; i < tmp2.getCols(); ++i) {
-        cout << tmp2(i, i) << "   ";
+void Zadanie_10_1() {
+    ODY ody(-1, 1, 10), ody20(-1, 1, 20);
+    Matrix  A = ody.getMatrix(1, 1, 0, 1, 0),
+        A20 = ody20.getMatrix(1, 1, 0, 1, 0),
+        A_h2 = ody.getMatrix(2, 1, 0, 1, 0),
+        A20_h2 = ody20.getMatrix(2, 1, 0, 1, 0);
+
+    vctr    b = ody.getVctr(1, 0, 0),
+        y = SLAE_QR(A, b),
+        b_h2 = ody.getVctr(2, 0, 0),
+        y_h2 = SLAE_QR(A_h2, b_h2),
+
+        b20 = ody20.getVctr(1, 0, 0),
+        y20 = SLAE_QR(A20, b20),
+        b20_h2 = ody20.getVctr(2, 0, 0),
+        y20_h2 = SLAE_QR(A20_h2, b20_h2);
+
+    cout << A << b << y;
+    cout << A_h2 << b_h2 << y_h2;
+    cout << A20 << b20 << y20;
+    cout << A20_h2 << b20_h2 << y20_h2;
+
+    // -0.8407   -0.8445   -0.8509   -0.8551   -0.8542   -0.8463   -0.8295   -0.8012   -0.7574   -0.6914   -0.5933
+
+  //0.2872    0.3475    0.4125    0.4802    0.5493    0.6183    0.6858    0.7494    0.8058    0.8487    0.8669
+
+  //  0    0.1012    0.2142    0.3313    0.4439    0.5419    0.6113    0.6314    0.5704    0.3816         0
+  //  0    0.0487    0.1012    0.1567    0.2142    0.2728    0.3313    0.3888    0.4439    0.4955    0.5419    0.5813    0.6113    0.6292    0.6314    0.6136    0.5704    0.4956    0.3816    0.2197    0
+
+}
+
+int main() {
+    setlocale(LC_ALL, "Russian");
+    double epsilon = 1e-6;
+    double a = 0, b = 1, lambda = -0.1;
+    Fredholm fr(a, b, lambda);
+    vctr u = fr.getVector_u(epsilon);
+    int n = u.vec.size()-1;
+
+    for (int i = 0; i <= n; i++) {
+        cout << i << ": u(" << (a + i * (b - a) / n) << ") = " << u.vec[i] << endl;
     }
-    cout << "\n\n";
 
 return 0;
 }

@@ -12,9 +12,9 @@ class Matrix {
 		Matrix(size_t rows, size_t cols) : data(rows, vector<double>(cols, 0.0)) {}
 		Matrix(vector<vector<double>> dt) : data(dt) {}
 		Matrix(vctr v);
-		static Matrix unit_matr(size_t n);						// tmp = Matrix::unit_matr(3)
-		static Matrix rand_matr(size_t rows, size_t cols);		// tmp = Matrix::rand_matr(3, 5)
-		static Matrix symmetry_matr(size_t rows, size_t cols);
+		static Matrix unit_matr(size_t n);						// tmp = Matrix::unit_matr(n)
+		static Matrix rand_matr(size_t rows, size_t cols);		// tmp = Matrix::rand_matr(r, c)
+		static Matrix symmetry_matr(size_t rows, size_t cols);	// tmp = Matrix::symmetry_matr(r, c)
 		
 		size_t getRows() const { return data.size(); }
 		size_t getCols() const { return data[0].size(); }
@@ -40,13 +40,13 @@ class Matrix {
 		bool find_QR_matrix(Matrix& Q, Matrix& R);							// нахождение QR разложения матрицы А
 		bool find_L_Lt_matrix(Matrix& L, Matrix& L_t);						// нахождение матриц L и L_t для метода Холецкого
 		Matrix find_P_matrix();												// нахождение матрицы перестановок Р для матрицы А
-		Matrix find_Hessenberg();
+		Matrix find_Hessenberg();											// приведение матрицы А к форме Хессенберга; используется для ускорения метода QR-алгоритма
 
 		double power_law_method(double accuracy, vctr& x_next);							// нахождения собственного значения с максимальной абсолютной величиной; условие: |λ| < 1
 		double power_law_method_with_normalization(double accuracy, vctr& x_next);		// нахождения собственного значения с максимальной абсолютной величиной; для любых λ
 		vctr reverse_iterations_method(double lambda);						// нахождение собственного вектора по собственному числу методом обратных итераций
 		vctr reverse_iterations_method_Rayleigh(double& l);					// нахождение собственного числа и собственного вектора методом обратных итераций с использованием отношение Рэлея
-		Matrix QR_algorithm(double accuracy);
+		Matrix QR_algorithm(double accuracy);								// нахождение собственных чисел матрицы А (располагаются на главной диагонали матрицы значения)
 
 		friend Matrix inverse(Matrix& m);									// обратная матрица
 		friend Matrix transpos(Matrix& m);									// транспозиция

@@ -481,7 +481,6 @@ vctr Matrix::reverse_iterations_method_Rayleigh(double& l) {
     l = lambda;
     return x;
 }
-
 Matrix Matrix::QR_algorithm(double accuracy) {
     if (getCols() != getRows()) {
         cout << "    Error: wrong size for QR_algorithm\n\n";
@@ -497,7 +496,6 @@ Matrix Matrix::QR_algorithm(double accuracy) {
     } while ((Q - q).norm_evkl() > accuracy);
     return A;
 }
-
 Matrix Matrix::find_Hessenberg() {
     if (getCols() != getRows()) {
         cout << "    Error: wrong size for Hessenberg\n\n";
